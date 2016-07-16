@@ -4,7 +4,6 @@ from django.template import RequestContext
 from django.conf import settings
 from django.core.cache import cache
 from django.views.generic import View
-from .models import Post
 from django_redis import get_redis_connection
 import datetime
 import json

@@ -3,8 +3,12 @@
     <head>
         <title>I come from template!!</title>
         <style>
-            body { background-color: lightyellow;}
-            em {color: LightSeaGreen;}
+            body {
+               background-color: lightyellow;
+            }
+            em {
+                color: LightSeaGreen;
+            }
         </style>
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -16,17 +20,10 @@
         {% load staticfiles %}
 
     </head>
-
     <body>
-        <h1>This is a django project!</h1>
-        cookie: <em>{{ cookie }}</em><br>
-        ip: <em>{{ ip }}</em><br>
-        date: <em>{{ date }}</em><br>
-        access_hist: <em>{{ access_hist }}</em><br>
-        <img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
+    {% block content %}
+    {% endblock %}
     </body>
-
     <footer>
-
     </footer>
 </html>
