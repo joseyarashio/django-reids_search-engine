@@ -24,6 +24,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^hello/$', hello_world),
     url(r'^test/$', test, name = 'test'),
-    # url(r'^search/$', search, name = 'search'),
+    url(r'^search/$', search, name = 'search'),
     url(r'^post/(?P<pk>\d+)/$', post_detail, name = 'post'),
 ]
