@@ -7,44 +7,41 @@ from django.views.generic import View
 from django_redis import get_redis_connection
 import datetime
 import json
+import os
 
 # Create your views here.
 #read cache user id
 def read_from_cache(user_name):
-    key = 'user_id_of_'+user_name
-    value = cache.get(key)
+    key = user_name
+    value = cache.keys(key)
     if value == None:
         data = None
     else:
-        data = json.loads(value)
+        data = ''
+        # data = json.loads(value)
     return data
 
 #write cache user id
-def write_to_cache(user_name):
-    key = 'user_id_of_'+user_name
-    cache.set(key, json.dumps(user_name), settings.NEVER_REDIS_TIMEOUT)
+def write_to_cache(obj):
+    key = obj["key"]
+    cache.set(key, json.dumps(obj), settings.NEVER_REDIS_TIMEOUT)
 
 def search(request):
     try:
         if request.method == 'GET':
-            session  = request.session
-            cookie   = request.COOKIES.get('logged_in_status')
-            ip = get_client_ip(request)
 
             # read from redis cache
-            access_hist = read_from_cache(str(ip))
+            access_hist = read_from_cache("")
 
-            response = render(request, 'hello_world.html', {
-                'cookie': str(cookie),
-                'ip'    : str(ip),
+            response = render(request, 'search.html', {
+                # 'cookie': str(cookie),
                 'date'  : str(datetime.date.today().strftime("%B %d, %Y")),
                 'access_hist'  : access_hist,
             })
 
             # write to  redis cache
-            write_to_cache(str(ip))
+            # write_to_cache(str(ip))
 
-            set_cookie(response,'logged_in_status',"123",7)
             # get_redis_connection("default")
         return response
 
@@ -53,3 +50,24 @@ def search(request):
 
     except ValueError:
         raise Http404()
+def writeall(request):
+    os.chdir(r'/home/johnny/djangogirls/mysite/search')
+    with open("dict.txt", "r") as f:
+        lines = f.readlines()
+        # read from redis cache
+        access_hist = read_from_cache("")
+        obj = {
+            'key'   :   lines[12333].replace('\n', ''),
+            'ins_date'  : str(datetime.date.today().strftime("%B %d, %Y")),
+        }
+        write_to_cache(obj)
+        response = render(request, 'search.html', {
+            # 'cookie': str(cookie),
+            'date'  : str(datetime.date.today().strftime("%B %d, %Y")),
+            'dict'  : lines[1234],
+        })
+
+        # write to  redis cache
+        # write_to_cache(str(ip))
+        # get_redis_connection("default")
+        return response
