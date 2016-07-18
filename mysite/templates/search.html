@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+        <!-- <script type="text/javascript" src="http://www.google.com/jsapi"></script> -->
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="/resources/demos/style.css">
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -31,11 +31,15 @@
             <h1>Enter what you want to search!</h1>
             <div class="ui-widget">
                 <label for="tags">Search: </label>
-                <form action="">
-                    <input id="tags" type="text" class="form-control" placeholder="Search..." onkeyup="search()">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <input id="tags" name="tags" type="text" class="form-control" placeholder="Search..." onkeyup="">
                 </form>
             </div>
-            dict: <em>{{ dict }}</em><br>
+            {% if type %}type: <em>{{ type }}</em><br>{% endif %}
+            {% if time %}time: <em>{{ time }}</em><br>{% endif %}
+            {% if dict %}dict: <em>{{ dict }}</em><br>{% endif %}
+            {% if data %}data: <em>{{ data }}</em><br>{% endif %}
         </div>
     </body>
     <footer>
@@ -47,16 +51,21 @@
       "Python",
       "Scheme"
     ];
-    function search(){
+    function search(post){
         $.ajax({
-            url : '/search/42',
+            url : '/search',
             dataType : 'json',
             type:'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                word:post,
+            },
             // ifModified makes it so that the done callback is only called
             // if the response is not a 304 Not Modified.
             ifModified : true
-            }).done(function(response) {
-                doStuffWith(response);
+        }).done(function(response) {
+            // doStuffWith(response);
+
         });
 
         $( "#tags" ).autocomplete({
