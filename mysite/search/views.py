@@ -6,28 +6,55 @@ from django.conf import settings
 from django.core.cache import cache
 from django.views.generic import View
 from django_redis import get_redis_connection
+from django.views.decorators.csrf import csrf_exempt
 import datetime
 import json
 import os
 
 # Create your views here.
+def search_from_cache(key):
+    if key != "":
+        value = cache.keys(str(key)+"*")
+
+    if value != None:
+        data = json.dumps(value)
+    else:
+        data = None
+    return data
 #read cache user id
 def read_from_cache(key):
-
-    value = cache.keys(key)
-
+    value = cache.get(str(key))
     if value == None:
         data = None
     else:
-        data = ''
-        # data = json.loads(value)
+        data = json.loads(value)
     return data
 
 #write cache user id
 def write_to_cache(obj):
     key = obj["key"]
-
     cache.set(str(key), json.dumps(obj), settings.NEVER_REDIS_TIMEOUT)
+
+def dropsearch(request):
+    if request.method == 'POST' and request.is_ajax():
+        word = request.POST["word"]
+
+        startT = datetime.datetime.now()
+        result = search_from_cache(word)
+        endT = datetime.datetime.now()
+
+        data = {
+            "status"    :   "100" ,
+            "count"     :   len(result),
+            "word"      :   word,
+            "search_q"  :   str('*:'+word+'*'),
+            "qtime"     :   str(int((endT - startT).microseconds)/1000)+"ms",
+            "result"    :   result,
+        }
+        #Returning same data back to browser.It is not possible with Normal submit
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        raise Http404()
 
 def search(request):
     try:
@@ -40,8 +67,8 @@ def search(request):
             }
 
         if request.method == 'POST':
-            text = request.POST["tags"]
-            data = read_from_cache(':'+text+'*')
+            word = request.POST["tags"]
+            data = read_from_cache(word)
             response = {
                 'type'  :   'POST',
                 'date'  :   str(datetime.date.today().strftime("%B %d, %Y")),
@@ -50,7 +77,7 @@ def search(request):
 
         endT = datetime.datetime.now()
         pTime = endT - startT
-        response.update({'time' :   pTime.microseconds})
+        response.update({'time' :   str(int(pTime.microseconds)/1000)})
         # Improttant
         response.update(csrf(request))
         return render(request, 'search.html', response)
