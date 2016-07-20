@@ -10,7 +10,30 @@ from django.views.decorators.csrf import csrf_exempt
 import datetime
 import json
 import os
+import urllib
+import pycurl
+import StringIO
 
+def GetTrans(word):
+    url =   'https://www.googleapis.com/language/translate/v2?'
+    url +=  str('q='+word)
+    url +=  str('&target=zh-TW')
+    url +=  str('&key='+settings.GOOGLE_TRANS_API_KEY)
+
+    curl = pycurl.Curl()
+    b = StringIO.StringIO()
+    curl.setopt( pycurl.URL , url )
+    curl.setopt( pycurl.FOLLOWLOCATION , True )
+    curl.setopt( pycurl.WRITEFUNCTION, b.write)
+    curl.perform()
+    res = b.getvalue()
+    curl.close()
+    try:
+        json.loads(res)
+        return res
+    except ValueError:
+        return ''
+        
 # Create your views here.
 def search_from_cache(key):
     if key != "":
@@ -18,14 +41,16 @@ def search_from_cache(key):
 
     if value != None:
         data = json.dumps(value)
+        return data
     else:
         data = None
-    return data
+        return ''
+
 #read cache user id
 def read_from_cache(key):
     value = cache.get(str(key))
     if value == None:
-        data = None
+        data = {}
     else:
         data = json.loads(value)
     return data
@@ -67,12 +92,15 @@ def search(request):
             }
 
         if request.method == 'POST':
-            word = request.POST["tags"]
-            data = read_from_cache(word)
+            word    = request.POST["tags"]
+            data    = read_from_cache(word)
+            endT = datetime.datetime.now()
+            trans   = GetTrans(word)
             response = {
-                'type'  :   'POST',
-                'date'  :   str(datetime.date.today().strftime("%B %d, %Y")),
-                'data'  :   data,
+                'type'          :   'POST',
+                'date'          :   str(datetime.date.today().strftime("%B %d, %Y")),
+                'data'          :   data,
+                'google_trans'  :   trans,
             }
 
         endT = datetime.datetime.now()
@@ -87,6 +115,7 @@ def search(request):
 
     except ValueError:
         raise Http404()
+
 def writeall(request):
     startT = datetime.datetime.now()
     os.chdir(r'/home/johnny/djangogirls/mysite/search')

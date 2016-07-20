@@ -39,6 +39,7 @@
             {% if time %}time: <em>{{ time }}</em><br>{% endif %}
             {% if dict %}dict: <em>{{ dict }}</em><br>{% endif %}
             {% if data %}data: <em>{{ data }}</em><br>{% endif %}
+            {% if google_trans %}google translation: <em>{{ google_trans }}</em><br>{% endif %}
         </div>
     </body>
     <footer>
@@ -46,10 +47,7 @@
     </footer>
 </html>
 <script>
-    var availableTags = [
-      "Python",
-      "Scheme"
-    ];
+    var availableTags = [];
     function search(e){
         if(e.value.trim() == "")
             return false;
