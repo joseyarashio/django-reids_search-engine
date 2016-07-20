@@ -13,7 +13,7 @@ import os
 import urllib
 import pycurl
 import StringIO
-
+# import flask
 def GetTrans(word):
     url =   'https://www.googleapis.com/language/translate/v2?'
     url +=  str('q='+word)
@@ -33,7 +33,7 @@ def GetTrans(word):
         return res
     except ValueError:
         return ''
-        
+
 # Create your views here.
 def search_from_cache(key):
     if key != "":

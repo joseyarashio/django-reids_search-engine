@@ -35,11 +35,17 @@ def show(request,pk):
     # print("1")
 
 def post_detail(request, pk):
-    post = Post.objects.get(pk=pk)
-    if post is not None:
-        return render(request, 'post.html', {'post': post})
-    else:
-        return render(request, 'show.html', {'post': null})
+    # startT = datetime.datetime.now()
+    url = request.get_full_path
+
+    response = read_from_cache(url)
+    if response is None:
+        post = Post.objects.get(pk=pk)
+        response =  render(request, 'post.html', {'post': post,'url':url})
+        if(pk=='1'):
+            write_to_cache(url,response)
+    # endT = datetime.datetime.now()
+    return response
 
 def test(request):
     try:
@@ -74,16 +80,10 @@ def test(request):
 
 
 #read cache user id
-def read_from_cache(user_name):
-    key = 'user_id_of_'+user_name
-    value = cache.get(key)
-    if value == None:
-        data = None
-    else:
-        data = json.loads(value)
+def read_from_cache(key):
+    data = cache.get(str(key))
     return data
 
 #write cache user id
-def write_to_cache(user_name):
-    key = 'user_id_of_'+user_name
-    cache.set(key, json.dumps(user_name), settings.NEVER_REDIS_TIMEOUT)
+def write_to_cache(key,value):
+    cache.set(key, value, settings.NEVER_REDIS_TIMEOUT)
