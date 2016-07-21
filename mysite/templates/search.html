@@ -25,21 +25,23 @@
         {% load staticfiles %}
     </head>
     <body>
-        <div align="center" class="container">
-
-            <h1>Enter what you want to search!</h1>
-            <div class="ui-widget">
-                <label for="tags">Search: </label>
+        <div class="container">
+            <div class="ui-widget" align="center" >
+                <h1>Enter what you want to search!</h1>
                 <form action="" method="post">
                     {% csrf_token %}
+                    <label for="tags">Search: </label>
                     <input id="tags" name="tags" type="text" class="form-control" placeholder="Search..." onkeyup="search(this)">
                 </form>
             </div>
-            {% if type %}type: <em>{{ type }}</em><br>{% endif %}
-            {% if time %}time: <em>{{ time }}</em><br>{% endif %}
+            <br>
+            type: {% if type %}<pre><em>{{ type }}</em></pre>{% endif %}<br>
+            time: {% if time %}<pre><em><span id="time" >{{ time }} ms</span></em></pre>{% endif %}<br>
             {% if dict %}dict: <em>{{ dict }}</em><br>{% endif %}
-            {% if data %}data: <em>{{ data }}</em><br>{% endif %}
-            {% if google_trans %}google translation: <em>{{ google_trans }}</em><br>{% endif %}
+            cache_data: {% if data %}<pre><em>{{ data }}</em></pre>{% endif %}<br>
+            search_data: {% if search_data %}<pre><em>{{ search_data }}</em></pre>{% endif %}<br>
+            google translation: {% if google_trans %}<pre><em>{{ google_trans }}</em></pre>{% endif %}<br>
+            google search: {% if pic_data %}<pre><em><img src={{ pic_data }} /></em></pre>{% endif %}<br>
         </div>
     </body>
     <footer>

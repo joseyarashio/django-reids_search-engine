@@ -13,6 +13,11 @@ import os
 import urllib
 import pycurl
 import StringIO
+import thread
+# elasticsearch tools
+from esearchtool import EsearchTool
+
+eSearch = EsearchTool()
 # import flask
 def GetTrans(word):
     url =   'https://www.googleapis.com/language/translate/v2?'
@@ -29,11 +34,30 @@ def GetTrans(word):
     res = b.getvalue()
     curl.close()
     try:
-        json.loads(res)
-        return res
-    except ValueError:
+        data = json.loads(res)
+        return data['data']['translations'][0]['translatedText']
+    except:
         return ''
 
+def GetPic(word):
+    url =   'https://www.googleapis.com/customsearch/v1?'
+    url +=  str('q='+word)
+    url +=  str('&cx='+settings.GOOGLE_SEARCH_CX)
+    url +=  str('&key='+settings.GOOGLE_TRANS_API_KEY)
+
+    curl = pycurl.Curl()
+    b = StringIO.StringIO()
+    curl.setopt( pycurl.URL , url )
+    curl.setopt( pycurl.FOLLOWLOCATION , True )
+    curl.setopt( pycurl.WRITEFUNCTION, b.write)
+    curl.perform()
+    res = b.getvalue()
+    curl.close()
+    try:
+        data = json.loads(res)
+        return data["items"][0]["pagemap"]["cse_image"][0]["src"]
+    except:
+        return ''
 # Create your views here.
 def search_from_cache(key):
     if key != "":
@@ -94,13 +118,20 @@ def search(request):
         if request.method == 'POST':
             word    = request.POST["tags"]
             data    = read_from_cache(word)
-            endT = datetime.datetime.now()
             trans   = GetTrans(word)
+            search_data = eSearch.search(word)
+            pic_data = GetPic(word)
+
+            # zh = trans["data"]
+
+            endT = datetime.datetime.now()
             response = {
                 'type'          :   'POST',
                 'date'          :   str(datetime.date.today().strftime("%B %d, %Y")),
                 'data'          :   data,
                 'google_trans'  :   trans,
+                'search_data'   :   search_data,
+                'pic_data'      :   pic_data,
             }
 
         endT = datetime.datetime.now()
@@ -108,12 +139,11 @@ def search(request):
         response.update({'time' :   str(int(pTime.microseconds)/1000)})
         # Improttant
         response.update(csrf(request))
-        return render(request, 'search.html', response)
 
-    except TypeError:
-        raise Http404()
+        html = render(request, 'search.html', response)
+        return html
 
-    except ValueError:
+    except :
         raise Http404()
 
 def writeall(request):

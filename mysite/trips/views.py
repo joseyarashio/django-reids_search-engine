@@ -42,8 +42,8 @@ def post_detail(request, pk):
     if response is None:
         post = Post.objects.get(pk=pk)
         response =  render(request, 'post.html', {'post': post,'url':url})
-        if(pk=='1'):
-            write_to_cache(url,response)
+        # if(pk=='1'):
+        write_to_cache(url,response)
     # endT = datetime.datetime.now()
     return response
 
