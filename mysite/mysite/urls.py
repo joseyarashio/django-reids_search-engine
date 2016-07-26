@@ -26,6 +26,6 @@ urlpatterns = [
     url(r'^test/$', test, name = 'test'),
     url(r'^search/$', search, name = 'search'),
     url(r'^dropsearch/$', dropsearch, name = 'dropsearch'),
-    url(r'^writeall/$', writeall, name = 'writeall'),
+    # url(r'^writeall/$', writeall, name = 'writeall'),
     url(r'^post/(?P<pk>\d+)/$', post_detail, name = 'post'),
 ]

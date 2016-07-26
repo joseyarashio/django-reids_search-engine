@@ -58,7 +58,7 @@ def GetPic(word):
         return data["items"][0]["pagemap"]["cse_image"][0]["src"]
     except:
         return ''
-# Create your views here.
+
 def search_from_cache(key):
     if key != "":
         value = cache.keys(str(key)+"*")
@@ -141,6 +141,7 @@ def search(request):
         response.update(csrf(request))
 
         html = render(request, 'search.html', response)
+
         return html
 
     except :

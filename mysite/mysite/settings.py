@@ -26,7 +26,9 @@ GOOGLE_TRANS_API_KEY = 'AIzaSyD1Xy3wOUjCRz9xxfMXybYaAn7NaUh90SE'
 GOOGLE_SEARCH_CX = '009443304403516182297%3Amwhfo9kvr2e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TEMPLATE_DEBUG = True
 
+# add this for allowing outside access from http
 ALLOWED_HOSTS = ['*']
 
 
